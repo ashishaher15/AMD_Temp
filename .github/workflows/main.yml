@@ -1,0 +1,84 @@
+name: MERN Hospital Management CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  MONGODB: "mongodb+srv://sunil22210652:RKSyadav@cluster0.gx1fm.mongodb.net"
+  CLOUDINARY_NAME: "dh2jzzajk"
+  CLOUDINARY_API_KEY: "919171837454181"
+  CLOUDINARY_SECRET_KEY: "slL3A_3jffcaN6f-KmnyviVhcoQ"
+  JWT_SECRET: "12345678"
+  EMAIL_USER: "sunil.22210652@viit.ac.in"
+  EMAIL_PASSWORD: "RKSyadav@2026"
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        cache-dependency-path: './backend/package-lock.json'
+
+    - name: Install backend dependencies
+      run: npm ci
+
+    - name: Run backend tests
+      run: npm test
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./water2
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        cache-dependency-path: './water2/package-lock.json'
+
+    - name: Install frontend dependencies
+      run: npm ci
+
+    - name: Build frontend
+      run: npm run build
+
+  deploy:
+    needs: [test-backend, test-frontend]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+
+    - name: Deploy to Vercel
+      run: |
+        npm install -g vercel
+        vercel --prod --confirm --token="Y2AOGzcdxRHayXGV30J8ID6M"
+
+    - name: Deployment Status
+      run: |
+        echo "🚀 Deployment completed!"
+        echo "Frontend URL: https://your-vercel-app.vercel.app"
