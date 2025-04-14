@@ -35,36 +35,15 @@ jobs:
     - name: Install backend dependencies
       run: npm ci
 
-    - name: Simulate backend test
+    - name: Fake test backend
       run: |
-        echo "Running backend test simulation..."
+        echo "✅ Backend testing placeholder..."
         sleep 3
-        echo "Backend testing done ✅"
 
-  test-frontend:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./water2
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18.x'
-        cache: 'npm'
-        cache-dependency-path: './water2/package-lock.json'
-
-    - name: Install frontend dependencies
-      run: npm ci
-
-    - name: Skip frontend build (disabled)
-      run: echo "Skipping frontend build for now..."
+  # Removed frontend build/test job as requested
 
   deploy:
-    needs: [test-backend, test-frontend]
+    needs: [test-backend]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
 
@@ -79,7 +58,7 @@ jobs:
     - name: Deploy to Vercel
       run: |
         npm install -g vercel
-        vercel --prod --confirm --token="Y2AOGzcdxRHayXGV30J8ID6M"
+        vercel --prod --yes --token="Y2AOGzcdxRHayXGV30J8ID6M" --name="mern-hms"
 
     - name: Deployment Status
       run: |
